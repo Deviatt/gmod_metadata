@@ -41,15 +41,16 @@ local stored, pcache, Sync, encode = metadata.stored, {} do
 			"INSERT INTO `metadata` VALUES(%s, %s, %s, %s)"
 		}
 
+		local isvalid = IsValid
 		local function GetCachedPlayerBySteamID64(sid64)
 			local ply = pcache[sid64]
-			if (ply) then return ply end
+			if (isvalid(ply)) then return ply end
 			ply = player.GetBySteamID64(sid64)
 			pcache[sid64] = ply
 			return ply
 		end
 
-		local typeid, format, query, isvalid, sqlstr = TypeID, Format, sql.Query, IsValid, SQLStr
+		local typeid, format, query, sqlstr = TypeID, Format, sql.Query, SQLStr
 		local function Set(sid64, key, value, recipients, nosave)
 			local ply = GetCachedPlayerBySteamID64(sid64)
 			if (isvalid(ply)) then
@@ -61,7 +62,7 @@ local stored, pcache, Sync, encode = metadata.stored, {} do
 			if (value == nil) then
 				query("DELETE FROM `metadata` WHERE sid64 = "..sid64.." AND key = "..key)
 			else
-				local key = sqlstr(key)
+				key = sqlstr(key)
 				local data, type = query("SELECT `sid64` FROM `metadata` WHERE `sid64` = "..sid64.." AND `key` = "..key), typeid(value)
 				query(data && format(prepared[1], sqlstr(value), type, sid64, key) || format(prepared[2], sid64, key, sqlstr(value), type))
 			end
@@ -72,6 +73,7 @@ local stored, pcache, Sync, encode = metadata.stored, {} do
 		end
 
 		function metadata.Wait(ply, cback)
+			if (ply.IsFullyMetadataLoaded) then return end
 			if (!ply.MetadataWait) then ply.MetadataWait = {} end
 			ply.MetadataWait[#ply.MetadataWait + 1] = cback
 		end
