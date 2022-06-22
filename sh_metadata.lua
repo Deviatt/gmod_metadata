@@ -64,7 +64,7 @@ local stored, pcache, Sync, encode = metadata.stored, {} do
 			else
 				key = sqlstr(key)
 				local data, type = query("SELECT `sid64` FROM `metadata` WHERE `sid64` = "..sid64.." AND `key` = "..key), typeid(value)
-				query(data && format(prepared[1], sqlstr(value), type, sid64, key) || format(prepared[2], sid64, key, sqlstr(value), type))
+				query(data && format(prepared[1], sqlstr(encode(value, type)), type, sid64, key) || format(prepared[2], sid64, key, sqlstr(encode(value, type)), type))
 			end
 		end
 
