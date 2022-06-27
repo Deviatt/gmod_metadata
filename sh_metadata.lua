@@ -73,7 +73,7 @@ local stored, pcache, Sync, encode = metadata.stored, {} do
 		end
 
 		function metadata.Wait(ply, cback)
-			if (ply.IsFullyMetadataLoaded) then return end
+			if (ply.IsFullyMetadataLoaded) then return cback(ply) end
 			if (!ply.MetadataWait) then ply.MetadataWait = {} end
 			ply.MetadataWait[#ply.MetadataWait + 1] = cback
 		end
